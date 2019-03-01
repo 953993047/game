@@ -1,0 +1,44 @@
+*{
+    margin:0;
+    padding:0;
+    border:0;
+}
+#box{
+	/*margin-top: 100px;*/
+    width:500px;
+    height: 500px;
+    background:#c6efa2;
+    border:1px solid pink;
+}
+button{
+	width: 110px;
+	height: 50px;
+	background: #8cd0e2;
+	border-radius: 5px;
+	margin-left: 42px;
+	padding: 10px;
+	font-size: :30px;
+	font-size: x-large;
+}
+p{
+	display: inline-block;
+	margin-left: 200px;
+}
+@media screen and (min-width:900px) {//当屏幕最小宽度为900px,相当于pc笔记本
+	*{
+		margin: 0
+	}
+	.main{
+		width: 300px
+	}
+}
+@media screen and (min-width: 600px) and (max-width: 900px){
+	#main{//当屏幕宽度在600~900px之间是，相当于平板电脑的大小
+		width: 200px;
+	}
+}
+@media screen and(max-width: 600px) {
+	#main{//当屏幕宽度在600px以下，即在移动端
+		width: 900px;
+	}
+}
