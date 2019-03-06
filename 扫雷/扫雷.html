@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>扫雷</title>
+	<style>
+		*{
+			margin:0;
+			padding:0;
+		}
+		.start{
+			width: 300px;
+			height: 300px;
+			margin:auto;
+			background-image:url(图片/startGame.png);
+			background-size: 100%;
+			background-color: yellow;
+			border:solid 1px black;
+		}
+		#box{
+			display: none;
+			width: 220px;
+			height: 240px;
+			margin:auto;
+		}
+		.block{
+			width: 19px;
+			height: 19px;
+			border:solid 0.8px black;
+			font-size: 19px;
+			text-align: center;
+			float: left;
+			background:green;
+		}
+		#minenum{
+			text-align: center;
+			font:bold;
+		}
+		.isMine{
+			background-image: url(图片/dilei.jpg);
+			background-size: cover;
+		}
+		.num{
+			font-size:19px;
+			font-weight: bold;
+		}
+		.hongqi{
+			background-image: url(图片/hongqi.jpg);
+			background-size: cover;
+		}.gameover{
+			background-image: url(图片/over.jpg);
+			background-size: 100%;
+		}
+		.success{
+			background-image: url(图片/success.png);
+			background-size: 100%;
+		}
+		.check{
+			background: white;
+		}
+	</style>
+</head>
+<body>
+	<div class ="start"></div>
+	<div id="box">
+	</div>
+	<script>
+//思维要点：通过位元素添加空雷标记元素利用classList.contains('classname')判断；
+//通过切割分开字符判断，学会利用递归
+//e.button=3右键=1左键
+//e.target是点击的源元素
+//document.creatElement('div');
+//document.appendchild(node);
+//dom.
+		var start = document.getElementsByClassName('start')[0];
+		var box=document.getElementById('box');
+		var mine=10;
+		var tmleft=10;
+		var count=0;
+		mineIndex=0;								//地点序号
+		var mineArray=[];   //所有雷的序数
+		var mineMap=[];//标记是否已经埋雷
+		game();
+		function game(){
+			for (var i = 0; i < 100; i++) {
+				mineMap.push(0);//标记是否已经埋雷
+			}
+			box.oncontextmenu=function(){//取消右键默认事件
+					return false;
+				}
+			start.onclick=function(){
+				start.style.display ='none';//去掉开始页面
+				var left=document.createElement('div');
+				left.innerHTML="还剩下<span>   </span>个雷";
+				var span=document.getElementsByTagName('span');//还剩余多少个雷
+				box.appendChild(left);
+				box.style.display='block';//显示游戏格子
+				span[0].innerHTML=10;
+	//循环生成格子10*10个
+				for ( var i = 0; i <10; i++)
+				{
+					for (var j = 0; j<10; j++) {
+						var boxin=document.createElement('div');
+						boxin.classList.add('block');
+						// boxin.setAttribute('class', 'block')也是同样的
+						boxin.id=i+'-'+j;
+						box.appendChild(boxin);
+					}
+				box.appendChild(boxin);//将动态生成的格子添加到box中
+				}
+				block=document.getElementsByClassName('block');//获取block类数组元素
+	//生成10个雷不允许重复，注意判断重复值
+	//mineIndex为雷的随机序数为0到100之间
+	//且用mineMap[mineIndex]标记，如果已经为1则已经标记过地雷循环回1并break
+				for (var i = 0; i < 10; i++) {
+					//生成随机数
+					mineIndex=Math.floor(Math.random()*100);
+					//若随机数和前面有重复
+					if(mineMap[mineIndex]==1){
+						i--;
+						continue;
+					}
+					if(mineIndex<10){
+						tmineIndex=0+''+mineIndex;
+						// tmineIndex=parseInt(tmineIndex);
+					}else{
+						tmineIndex=mineIndex;
+					}
+					block[mineIndex].classList.add('isLei');
+					mineMap[tmineIndex]=1;
+					mineArray.push(tmineIndex);
+				}
+				box.onmousedown=function(e){
+				var e=window.event||e;//获取事件对象
+				var dom=e.target;
+			    var value=e.button;
+			    if(value==2||value==3){
+	// rightClick();
+					if(dom.classList.contains('hongqi')){
+						mine++;
+						span[0].innerHTML=mine;
+					}else{
+						mine--;
+						span[0].innerHTML=mine;
+					}
+					dom.classList.toggle('hongqi');
+
+					var n=0;//数字值
+					var id=dom.id;
+					var pos=id.split('-');
+					var posX=+pos[0];
+					var posY=+pos[1];
+					var nu=posX*10+posY;
+					if(block[nu].classList.contains('isLei')){//找到雷 且插上旗帜
+						tmleft--;
+						if(tmleft==8){//要改成10
+			    			start.classList.add('success');
+			    			start.style.display='block';
+			    			box.innerHTML='';
+			    			start.style.backgroundImage ="url('图片/startGame.png')";
+
+
+
+						}else{
+							console.log(tmleft);
+							span[0].innerHTML=mine;}
+					}
+				}
+	//leftClick
+			    else{
+					//判断是否有雷，若有雷Gameover
+			    	if (dom.classList.contains('isLei')) {
+			    		//将十个雷都显示
+						for (var i = 0; i < 10; i++) {
+							if(typeof(mineArray[i])=='string'){
+								mineArray[i]=+mineArray[i];
+							}
+								block[mineArray[+i]].classList.add('isMine');//show雷
+						}
+						setTimeout(again, 1000)
+						game();
+						// setTimeout(time(),10000);
+						//如果点到数字则显示数字并扩散
+					}else{
+						checknum(dom);
+						// i-1,j-1   i-1,j    i-1,j+11
+						// i,j-1	  i,j      i,j+1
+						// i+1,j-1    i+1,j   i+1,j+1
+					}
+				}
+
+			}
+			}
+		}
+		function checknum(dom){//扩散
+					var n=0;//数字值
+					var id=dom.id;
+					var pos=id.split('-');
+					var posX=+pos[0];
+					var posY=+pos[1];
+					for (var i=posX-1;i<=posX+1 ;i++) {//矩阵循环查询数字
+						for (var j=posY-1; j <= posY+1; j++) {//循环看周围有多少个雷
+							var nu=i*10+j;
+							if(i>=0&&i<=9&&j>=0&&j<=9){
+								var yes=block[nu].classList.contains('isLei');
+								 if(yes==1){
+								 	n++;}
+							 }
+						}
+					}
+					dom.classList.add('check');
+					if(n==0){   //数字为零继续扩散
+						for (var x=posX-1;x<=posX+1 ;x++) {
+							for (var y=posY-1; y <= posY+1; y++) {
+								var no=x*10+y;
+								if(x>=0&&x<=9&&y>=0&&y<=9){
+									 var nearBox=block[x*10+y];
+						 			 if(!nearBox.classList.contains('check')){
+						 				checknum(nearBox);
+						 			 }
+						 		}
+					 		}
+					 	}
+					 }else{
+					 	dom.innerHTML=n;
+					 }
+		}
+		 function again(){
+					 	start.style.display='block';
+					 	var childs = box.childNodes;
+					 	for(var i = childs.length - 1; i >= 0; i--) {
+							  box.removeChild(childs[i]);
+						}
+
+		}
+	</script>
+</body>
+</html>
