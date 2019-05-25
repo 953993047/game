@@ -1,14 +1,15 @@
 //一定注意数组为引用类型，赋值要保存一个进行深度克隆保存一个中间数组再赋值
 var content = document.getElementById('box'); //地图
-var conti = true;
-var timer;
-var start=document.getElementsByTagName('button')[0];
-start.onclick=function(){
-    var snake1 = new snakeGame(box);
+var start = document.getElementsByTagName('button')[0];
+start.addEventListener("click", startGame);
+
+function startGame() {
+    snake1 = new snakeGame(box);
     snake1.foodinit();
     snake1.whichdirc(); //判断按键确定方向，并记录
     snake1.bodyinit();
     snake1.move();
+    start.removeEventListener('click', startGame);
 }
 
 function snakeGame(content) {
@@ -17,20 +18,19 @@ function snakeGame(content) {
             [1, 2],
             [0, 2] //蛇尾
         ],
-    timer = null, //定时器
+    this.timer = null, //定时器
     this.count = 0, //记录吃的食物
     this.dirc = 'right', //方向
     this.elements = [], //,即新添加的实际蛇身div
-    this.foods = []; //为方便删除食物的数组
+    this.foods = [] //为方便删除食物的数组
 };
-
 
 snakeGame.prototype = {
     move: function() {
         var that = this;
-        timer = setInterval(function() { //定时器来
+        clearInterval(this.timer);
+        this.timer = setInterval(function() { //定时器来
             that.end(); //判断是否结束游戏
-            that.pause();
             that.eaten(); //判断是否吃food，处理吃了事物后对删除并产生新食物，加长身体
             var temp = deepcopy(that.snake);
             switch (that.dirc) { //根据方向来定义蛇首位置
@@ -53,9 +53,7 @@ snakeGame.prototype = {
                 that.snake[i][1] = temp[i - 1][1];
             }
             that.remove(); //删除蛇身
-
             that.bodyinit(); //创造新的蛇身
-            // snake.push(snake[snake.length-1])
         }, 100);
     },
 
@@ -68,8 +66,8 @@ snakeGame.prototype = {
         }
         elements = null;
     },
-    //根据数组循环出蛇身
 
+    //根据数组循环出蛇身
     bodyinit: function() {
         elements = [];
         for (var i = 0; i < this.snake.length; i++) {
@@ -162,12 +160,16 @@ snakeGame.prototype = {
     },
     //停止游戏
     pause: function() {
-        if (!conti) { //如果暂停
-            clearInterval(timer);
-            document.onkeydown = null;
-        } else {
-            this.move();
-        }
+        // if (!this.conti) { //如果暂停
+        clearInterval(this.timer);
+        document.onkeydown = null;
+        // } else {
+        //     this.move();
+        // }
+    },
+    conti: function() {
+        this.whichdirc();
+        this.move();
     },
     //判断是否结束游戏1.蛇超出边框2.蛇头碰到了蛇身
     end: function() {
@@ -181,38 +183,29 @@ snakeGame.prototype = {
         } else if (this.snake[0][0] < 0 || this.snake[0][1] < 0) {
             this.renew();
         }
-        // else if(1==0) {
-        //      alert('game over');
-        //     clearInterval(timer);
-        //     timeer = null;
-        //     foods[0].parentNode.remove(foods[0]);
-        //     foods.splice(0, 1);
-        // }
     },
 
     renew: function() {
         alert('game over');
-        clearInterval(timer);
-        timer = null;
+        clearInterval(this.timer);
+        this.timer = null;
         this.remove();
         content.removeChild(this.foods[0]);
         this.foods.splice(0, 1);
-
         this.snake = [ //[left,top]蛇身的位置
             [2, 0], //蛇首
             [1, 0],
             [0, 0] //蛇尾
         ];
-        timer = null; //定时器
+        this.timer = null; //定时器
         this.count = 0; //记录吃的食物
         this.dirc = 'right'; //方向
         this.elements = []; //,即新添加的实际蛇身div
         this.foods = []; //为方便删除食物的数组
+        start.removeEventListener('click', startGame);
+        start.addEventListener('click', startGame);
     }
-  }
-// function conti(){
-//     move();
-// }
+}
 function deepcopy(obj) {
     var out = [],
         i = 0,

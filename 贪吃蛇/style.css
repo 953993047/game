@@ -24,21 +24,3 @@ p{
 	display: inline-block;
 	margin-left: 200px;
 }
-@media screen and (min-width:900px) {//当屏幕最小宽度为900px,相当于pc笔记本
-	*{
-		margin: 0
-	}
-	.main{
-		width: 300px
-	}
-}
-@media screen and (min-width: 600px) and (max-width: 900px){
-	#main{//当屏幕宽度在600~900px之间是，相当于平板电脑的大小
-		width: 200px;
-	}
-}
-@media screen and(max-width: 600px) {
-	#main{//当屏幕宽度在600px以下，即在移动端
-		width: 900px;
-	}
-}
