@@ -1,3 +1,10 @@
+/*
+遇到的问题，发现定时器越走越快
+是定时器使用js定时器（setinterval）首要的问题就是要记得清除，即调用（clearInterval）方法，
+由于没有使用定时器的经验，我一开始是没有清除定时器，程序每一次初始化的时候都调用一次定时
+器，之前的定时器实例没有被销毁，新的定时器又开始执行，就会出现1s变0.5s，0.5s变0.25秒的情
+况，从观感上来看就是定时器“越走越快”了
+*/
 //一定注意数组为引用类型，赋值要保存一个进行深度克隆保存一个中间数组再赋值
 var content = document.getElementById('box'); //地图
 var start = document.getElementsByTagName('button')[0];
